@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Api.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -20,11 +21,19 @@ public class WorldController : ControllerBase
     [Route("preview")]
     public async Task<IActionResult> Preview([FromForm] WorldPreviewSettings worldPreviewSettings)
     {
-        var mapOptions = JsonSerializer.Deserialize<MapOptions>(worldPreviewSettings.MapOptions);
-        var biomes = JsonSerializer.Deserialize<Biome[]>(worldPreviewSettings.Biomes);
-        var elevationOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.ElevationOptions);
-        var precipitationOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.PrecipitationOptions);
-        var temperatureOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.TemperatureOptions);
+        var serialOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+
+        var mapOptions = JsonSerializer.Deserialize<MapOptions>(worldPreviewSettings.MapOptions, serialOptions);
+        var biomes = JsonSerializer.Deserialize<Biome[]>(worldPreviewSettings.Biomes, serialOptions);
+        var elevationOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.ElevationOptions, serialOptions);
+        var precipitationOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.PrecipitationOptions, serialOptions);
+        var temperatureOptions = JsonSerializer.Deserialize<Options>(worldPreviewSettings.TemperatureOptions, serialOptions);
+
+        if (mapOptions == null || biomes == null || elevationOptions == null || precipitationOptions == null || temperatureOptions == null) return BadRequest("Failed to deserialize parameters");
+
+        var maps = WorldGenerator.GenerateMaps(mapOptions, elevationOptions, precipitationOptions, temperatureOptions);
+        var world = WorldGenerator.InitializeWorld(mapOptions, elevationOptions, precipitationOptions, temperatureOptions);
+        var regions = WorldGenerator.InitializeRegions(world, maps);
 
         return Ok(new
         {
@@ -41,37 +50,5 @@ public class WorldController : ControllerBase
     {
         return Ok("save");
     }
-}
-
-public class WorldPreviewSettings
-{
-    public string MapOptions { get; set; }
-    public string Biomes { get; set; }
-    public string ElevationOptions { get; set; }
-    public string PrecipitationOptions { get; set; }
-    public string TemperatureOptions { get; set; }
-}
-
-public class MapOptions
-{
-    public string serverId { get; set; }
-    public string worldName { get; set; }
-    public int width { get; set; }
-    public int height { get; set; }
-    public long elevationSeed { get; set; }
-    public long precipitationSeed { get; set; }
-    public long temperatureSeed { get; set; }
-}
-
-public class Options
-{
-    public decimal amplitude;
-    public decimal frequency;
-    public int octaves;
-    public decimal persistence;
-    public int scale;
-}
-public class WorldPreviewResponse
-{
 
 }
