@@ -34,13 +34,15 @@ public class WorldController : ControllerBase
         var maps = WorldGenerator.GenerateMaps(mapOptions, elevationOptions, precipitationOptions, temperatureOptions);
         var world = WorldGenerator.InitializeWorld(mapOptions, elevationOptions, precipitationOptions, temperatureOptions);
         var regions = WorldGenerator.InitializeRegions(world, maps);
+        var tiles = WorldGenerator.InitializeTiles(regions, biomes);
+        var plots = WorldGenerator.InitializePlots(tiles, biomes);
 
         return Ok(new
         {
-            world = new World { },
-            regions = new Region[] { },
-            tiles = new Tile[] { },
-            plots = new Plot[] { }
+            world = world,
+            regions = regions,
+            tiles = tiles,
+            plots = plots
         });
     }
 

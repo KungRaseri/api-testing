@@ -10,6 +10,8 @@ public partial class Tile
 
     public double Precipitation { get; set; }
 
+    public TileType Type { get; set; }
+
     public string RegionId { get; set; } = null!;
 
     public string BiomeId { get; set; } = null!;

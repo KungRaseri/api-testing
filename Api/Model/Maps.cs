@@ -2,7 +2,7 @@ namespace Api.Model;
 
 public class Maps
 {
-    public float[,]? ElevationNoiseData { get; set; }
-    public float[,]? PrecipitationNoiseData { get; set; }
-    public float[,]? TemperatureNoiseData { get; set; }
+    public double[]? ElevationNoiseData { get; set; }
+    public double[]? PrecipitationNoiseData { get; set; }
+    public double[]? TemperatureNoiseData { get; set; }
 }
